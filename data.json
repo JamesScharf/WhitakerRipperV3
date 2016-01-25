@@ -1,0 +1,14 @@
+{"stories":[
+    {"story":"story", "author": "name", "text":"storyText othertext", "vocab": [
+        {"storyText": "definition1", "othertext": "definition2"}
+        ]
+    },
+    {"story":"story2", "author": "name2", "text":"storyText othertext", "vocab": [
+        {"word": "definition", "word": "definition"}
+        ]
+    },
+    {"story":"story3", "author": "name", "text":"storyText othertext", "vocab": [
+        {"word": "definition", "word": "definition"}
+        ]
+    }
+]}
