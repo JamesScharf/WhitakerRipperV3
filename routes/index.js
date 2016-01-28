@@ -38,15 +38,15 @@ app.get("/authors/*/null", function(req, res) {
 //Load the actual story
 app.get("/authors/*/*", function(req, res) { //The author's story
     var result;
-    fs.readFile('getDefinition.js', 'utf8', function (err,data) {
+    fs.readFile('onload.js', 'utf8', function (err,data) {
         if (err) {
             console.log(err);
         }
         //console.log(data);
         result = data;
         //console.log(result);
-        res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><meta name='viewport' content='width=device-width, initial-scale=1.0'/><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'><script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script></head><body>");
-        console.log(result);
+        res.write("<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"><script src="http://code.jquery.com/jquery-1.11.3.min.js"></script><script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body>")
+        //console.log(result);
         res.write("<script>"+result+"</script>");
         var authorList = getAuthorList();
         var url = req.originalUrl; //Get the actual url
@@ -72,7 +72,8 @@ app.get("/authors/*/*", function(req, res) { //The author's story
             {
                 //console.log(vocabList[e]);
                 //res.write("<a onclick='alert('"+vocabList[e]+"', 4000)'>"+splitStory[e]+"</a> ");
-                res.write("<a onclick='alert(ajaxWord('"+splitStory[e]+"'))'>"+splitStory[e]+"</a> ");
+                res.write("<a class='waves-effect waves-light modal-trigger white black-text z-depth-0' href='#modal1'>Modal</a>");
+                res.write();
             }
             res.write("</body></html>");
             res.end();
@@ -80,17 +81,8 @@ app.get("/authors/*/*", function(req, res) { //The author's story
     });
 });
 
-app.get("/getWord", function(req, res) { //The author's story
-    var word = req.query["word"];
-    console.log(word);
-    request('http://archives.nd.edu/cgi-bin/wordz.pl?keyword='+word, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            res.send(body);
-        }
-    });
-});
 
-app.get("/submit", function(req, res) { //The author's story
+app.get("/submit", function(req, res) { //Submit a story
     //res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'><script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script></head><body>");
     res.sendFile(__dirname + '/submit.html');
     if(story != null)
@@ -100,7 +92,7 @@ app.get("/submit", function(req, res) { //The author's story
         var text = req.query['text'];
 
         var jsonStory = {"story": story, "author": author, "text": text};
-
+        //Need to add to data.json
 /*
         var splitStory = text.split(/[^A-Za-z]/);
         var currentWord;
@@ -122,6 +114,10 @@ app.get("/submit", function(req, res) { //The author's story
         //res.write("</body></html>");
         //res.end();
     }
+});
+
+app.get("/test", function(req, res) { //The author's story
+    res.sendFile(__dirname + '/test.html');
 });
 
 
