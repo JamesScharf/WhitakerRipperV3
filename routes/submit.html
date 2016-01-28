@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <head>
+        <title>WhitakerRipperV3</title>
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    </head>
+    <body>
+        <div class="row">
+            <div class="input-field col s6">
+                <form action="/submit" method="get">
+                    <p>
+                        Please do not repeatedly reload this current page. If you do, the same story might be sent in  twice.
+                        Also, please do not submit stories that have already been submitted.
+                    </p>
+                    <input placeholder="Enter story name" value="" id="story" name="story" type="text" class="validate">
+                    <input placeholder="Enter story author" id="author" name="author" type="text" class="validate">
+                    <input placeholder="Enter the text of the story" id="text" name="text" type="text" class="validate">
+                    <!--Not yet implemented-->
+                    <input placeholder="Enter the Greeley password (not yet implemented)" id="password" name="password" type="text" class="validate">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                        <i class="material-icons right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </body>
+    </html>

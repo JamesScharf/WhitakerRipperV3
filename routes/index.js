@@ -1,10 +1,13 @@
 var express = require("express");
 var app = express();
 var port = 3700;
+var request = require('request');
+var fs = require('fs');
+var interpolate = require('interpolate');
 
 //Load the list of authors
-app.get("/", function(req, res) {
-    res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title></head><body>");
+app.get("/authors", function(req, res) {
+    res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><meta name='viewport' content='width=device-width, initial-scale=1.0'/></head><body>");
     var authorList = getAuthorList();
     for(var w=0; w<= authorList.length-1; w++)
     {
@@ -17,7 +20,7 @@ app.get("/", function(req, res) {
 
 //Load the list of an author's stories
 app.get("/authors/*/null", function(req, res) {
-    res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title></head><body>");
+    res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><meta name='viewport' content='width=device-width, initial-scale=1.0'/></head><body>");
     var authorList = getAuthorList();
     var url = req.originalUrl; //Get the actual url
     var spliturl = url.split("/"); //Get the individual parts of the url
@@ -34,37 +37,94 @@ app.get("/authors/*/null", function(req, res) {
 
 //Load the actual story
 app.get("/authors/*/*", function(req, res) { //The author's story
-    res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'><script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script></head><body>");
-    var authorList = getAuthorList();
-    var url = req.originalUrl; //Get the actual url
-    var spliturl = url.split("/"); //Get the individual parts of the url
-    var author = spliturl[2]; //Get story name
-    var storyName = spliturl[3]; //Get story name
-    if(storyName != "null")
-    {
-        var storyList = getStoryListOfAuthor(author);
-        for(var w=0; w<= authorList.length-1; w++)
+    var result;
+    fs.readFile('getDefinition.js', 'utf8', function (err,data) {
+        if (err) {
+            console.log(err);
+        }
+        //console.log(data);
+        result = data;
+        //console.log(result);
+        res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><meta name='viewport' content='width=device-width, initial-scale=1.0'/><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'><script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script></head><body>");
+        console.log(result);
+        res.write("<script>"+result+"</script>");
+        var authorList = getAuthorList();
+        var url = req.originalUrl; //Get the actual url
+        var spliturl = url.split("/"); //Get the individual parts of the url
+        var author = spliturl[2]; //Get story name
+        var storyName = spliturl[3]; //Get story name
+        if(storyName != "null")
         {
-            if(storyList[w] == storyName)
+            var storyList = getStoryListOfAuthor(author);
+            for(var w=0; w<= authorList.length-1; w++)
             {
-                res.write("<h1>"+storyList[w]+"</h1>");
-                res.write("</br>");
-                w = authorList.length;
+                if(storyList[w] == storyName)
+                {
+                    res.write("<h1>"+storyList[w]+"</h1>");
+                    res.write("</br>");
+                    w = authorList.length;
+                }
             }
+            var splitStory = returnStorySplit(storyName);
+            //var vocabList = getVocab(storyName);
+            //res.write(splitStory[0])
+            for(var e=0; e<= splitStory.length-1; e++)
+            {
+                //console.log(vocabList[e]);
+                //res.write("<a onclick='alert('"+vocabList[e]+"', 4000)'>"+splitStory[e]+"</a> ");
+                res.write("<a onclick='alert(ajaxWord('"+splitStory[e]+"'))'>"+splitStory[e]+"</a> ");
+            }
+            res.write("</body></html>");
+            res.end();
         }
-        var splitStory = returnStorySplit(storyName);
-        var vocabList = getVocab(storyName);
-        //res.write(splitStory[0])
-        for(var e=0; e<= splitStory.length-1; e++)
+    });
+});
+
+app.get("/getWord", function(req, res) { //The author's story
+    var word = req.query["word"];
+    console.log(word);
+    request('http://archives.nd.edu/cgi-bin/wordz.pl?keyword='+word, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            res.send(body);
+        }
+    });
+});
+
+app.get("/submit", function(req, res) { //The author's story
+    //res.write("<!DOCTYPE html><html><head><head><title>WhitakerRipperV3</title><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js'></script><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css'><script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script></head><body>");
+    res.sendFile(__dirname + '/submit.html');
+    if(story != null)
+    {
+        var story = req.query['story']; //get storyName
+        var author = req.query['author'];
+        var text = req.query['text'];
+
+        var jsonStory = {"story": story, "author": author, "text": text};
+
+/*
+        var splitStory = text.split(/[^A-Za-z]/);
+        var currentWord;
+        var definition;
+        for(var g=0; g<= splitStory.length-1; g++)
         {
-            //console.log(vocabList[e]);
-            res.write("<a onclick='Materialize.toast('"+vocabList[e]+"', 4000)'>"+splitStory[e]+"</a> ");
-            //console.log(splitStory[e-1]);
+            currentWord = splitStory[g];
+            request('http://archives.nd.edu/cgi-bin/wordz.pl?keyword='+currentWord, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    //console.log(body);
+                    definition = body;
+                }
+            });
+            jsonStory.vocab[currentWord] = definition;
+            console.log(jsonStory.vocab[currentWord])
         }
-        res.write("</body></html>");
-        res.end();
+*/
+
+        //res.write("</body></html>");
+        //res.end();
     }
 });
+
+
 
 function getAuthorList()
 {
@@ -172,6 +232,16 @@ function getVocab(storyName) //Return an array of vocab words
 
     //console.log(stories);
     return vocabList;
+}
+
+function ripWhitaker(word)
+{
+    request('http://archives.nd.edu/cgi-bin/wordz.pl?keyword='+word, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body);
+            return body;
+        }
+    });
 }
 
 
